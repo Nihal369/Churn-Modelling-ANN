@@ -56,3 +56,11 @@ classifier.compile(optimizer="adam",loss="binary_crossentropy",metrics=['accurac
 
 #Fitting the ANN
 classifier.fit(xtrain,ytrain,batch_size=10,nb_epoch=100)
+
+#Testing the ANN
+ypred=classifier.predict(xtest)
+ypred=(ypred>0.5)
+
+#Confusion matrix
+from sklearn.metrics import confusion_matrix
+cm=confusion_matrix(ytest,ypred)
