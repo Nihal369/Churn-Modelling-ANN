@@ -33,6 +33,15 @@ x=scaler.fit_transform(x)
 from sklearn.model_selection import train_test_split
 xtrain,xtest,ytrain,ytest=train_test_split(x,y,test_size=0.1,train_size=0.9)
 
+#!!!-Building the ANN-!!!
+
+#Importing libraries
+import keras
+from keras.models import Sequential
+from keras.layers import Dense 
+
+#Initalizing the ANN
+classifier=Sequential()
 
 
 
