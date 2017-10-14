@@ -31,7 +31,7 @@ x=scaler.fit_transform(x)
 
 #Training and test set splitting
 from sklearn.model_selection import train_test_split
-xtrain,xtest,ytrain,ytest=train_test_split(x,y,test_size=0.1,train_size=0.9)
+xtrain,xtest,ytrain,ytest=train_test_split(x,y,test_size=0.2)
 
 #!!!-Building the ANN-!!!
 
@@ -45,9 +45,14 @@ classifier=Sequential()
 
 #Creating the layers
 #First Hidden layer and Input Layer
-classifier.add(Dense(units=6,activation="relu",kernel_initializer="uniform",input_dim=6))
+classifier.add(Dense(units=6,activation="relu",kernel_initializer="uniform",input_dim=11))
 #Second Hidden Layer
 classifier.add(Dense(units=6,activation="relu",kernel_initializer="uniform"))
 #Output layer
 classifier.add(Dense(units=1,activation="sigmoid",kernel_initializer="uniform"))
 
+#Compiling the ANN
+classifier.compile(optimizer="adam",loss="binary_crossentropy",metrics=['accuracy'])
+
+#Fitting the ANN
+classifier.fit(xtrain,ytrain,batch_size=10,nb_epoch=100)
