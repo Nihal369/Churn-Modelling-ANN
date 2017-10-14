@@ -22,3 +22,17 @@ x[:,1]=labelEncoder.fit_transform(x[:,1])
 x[:,2]=labelEncoder.fit_transform(x[:,2])
 oneHotEncoder=OneHotEncoder(categorical_features=[1],dtype=np.int)
 x=oneHotEncoder.fit_transform(x).toarray()
+x=x[:,1:]
+
+#Feature Scaling
+from sklearn.preprocessing import StandardScaler
+scaler=StandardScaler()
+x=scaler.fit_transform(x)
+
+#Training and test set splitting
+from sklearn.model_selection import train_test_split
+xtrain,xtest,ytrain,ytest=train_test_split(x,y,test_size=0.1,train_size=0.9)
+
+
+
+
