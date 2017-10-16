@@ -39,6 +39,7 @@ xtrain,xtest,ytrain,ytest=train_test_split(x,y,test_size=0.2)
 import keras
 from keras.models import Sequential
 from keras.layers import Dense 
+from keras.layers import Dropout
 
 #Initalizing the ANN
 classifier=Sequential()
@@ -46,8 +47,10 @@ classifier=Sequential()
 #Creating the layers
 #First Hidden layer and Input Layer
 classifier.add(Dense(units=6,activation="relu",kernel_initializer="uniform",input_dim=11))
+classifier.add(Dropout(rate=0.1))
 #Second Hidden Layer
 classifier.add(Dense(units=6,activation="relu",kernel_initializer="uniform"))
+classifier.add(Dropout(rate=0.1))
 #Output layer
 classifier.add(Dense(units=1,activation="sigmoid",kernel_initializer="uniform"))
 
@@ -55,7 +58,7 @@ classifier.add(Dense(units=1,activation="sigmoid",kernel_initializer="uniform"))
 classifier.compile(optimizer="adam",loss="binary_crossentropy",metrics=['accuracy'])
 
 #Fitting the ANN
-classifier.fit(xtrain,ytrain,batch_size=10,nb_epoch=100)
+classifier.fit(xtrain,ytrain,batch_size=10,epochs=100)
 
 #Testing the ANN
 ypred=classifier.predict(xtest)
@@ -64,3 +67,37 @@ ypred=(ypred>0.5)
 #Confusion matrix
 from sklearn.metrics import confusion_matrix
 cm=confusion_matrix(ytest,ypred)
+
+#Evaluvating the ANN
+from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import cross_val_score
+
+def build_classifier():
+    classifier=Sequential()
+    classifier.add(Dense(units=6,activation="relu",kernel_initializer="uniform",input_dim=11))
+    classifier.add(Dense(units=6,activation="relu",kernel_initializer="uniform"))
+    classifier.add(Dense(units=1,activation="sigmoid",kernel_initializer="uniform"))
+    classifier.compile(optimizer="adam",loss="binary_crossentropy",metrics=['accuracy'])
+
+classifier=KerasClassifier(build_fn=build_classifier,batch_size=10,epochs=10)
+accuracies=cross_val_score(classifier,xtrain,ytrain,cv=10,n_jobs=-1)
+
+#Parameter tuning
+from sklearn.model_selection import GridSearchCV
+
+def build_classifier(optimizer):
+    classifier=Sequential()
+    classifier.add(Dense(units=6,activation="relu",kernel_initializer="uniform",input_dim=11))
+    classifier.add(Dense(units=6,activation="relu",kernel_initializer="uniform"))
+    classifier.add(Dense(units=1,activation="sigmoid",kernel_initializer="uniform"))
+    classifier.compile(optimizer=optimizer,loss="binary_crossentropy",metrics=['accuracy'])
+    return classifier
+classifier=KerasClassifier(build_fn=build_classifier)
+parameters={'batch_size':[10,25,32,16],
+            'epochs':[100,500],
+            'optimizer':['adam','rmsprop']
+            }
+gridSearchCV=GridSearchCV(estimator=classifier,param_grid=parameters,scoring='accuracy',cv=2)
+gridSearchCV.fit(xtrain,ytrain)
+bestParams=gridSearchCV.best_params_
+bestAccuracy=gridSearchCV.best_score_
